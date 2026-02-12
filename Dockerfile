@@ -59,25 +59,26 @@ RUN corepack enable && \
 
 WORKDIR /app
 
-# 复制构建产物和扩展
+# 复制运行需要的配置 + 补丁文件（修复 patches 不存在报错）
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/pnpm-lock.yaml ./
+COPY --from=builder /app/pnpm-workspace.yaml ./
+COPY --from=builder /app/patches ./patches
+
+# 复制构建产物
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
-# 复制扩展（插件）目录，包括所有已编译的依赖
 COPY --from=builder /app/extensions ./extensions
-# 复制运行时所需的文档（templates 用于 agent 任务）
 COPY --from=builder /app/docs ./docs
 
 # 仅安装生产依赖
 RUN pnpm install --frozen-lockfile --production --ignore-scripts
 
-# 清理缓存以减小镜像大小
+# 清理缓存
 RUN pnpm store prune
 
 ENV NODE_ENV=production
 
-# 安全加固：以非 root 用户运行
-# node:22-bookworm 镜像包含 'node' 用户（uid 1000）
-# 这通过防止容器逃逸来减少攻击面
+# 非 root 运行
 USER node
 
 CMD ["node", "dist/index.js"]
