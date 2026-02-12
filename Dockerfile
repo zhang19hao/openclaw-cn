@@ -37,7 +37,7 @@ COPY ui/package.json ./ui/package.json
 COPY patches ./patches
 COPY scripts ./scripts
 
-RUN RUN pnpm install --ignore-scripts
+RUN pnpm install --ignore-scripts
 
 # 复制源码并构建
 COPY . .
