@@ -15,7 +15,3 @@ services:
         value: /data/workspace
       - key: CLAWDBOT_GATEWAY_TOKEN
         generateValue: true
-    disk:
-      name: clawdbot-data
-      mountPath: /data
-      sizeGB: 1
